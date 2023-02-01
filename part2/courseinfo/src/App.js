@@ -1,3 +1,38 @@
+const Header = ({header}) => {
+  console.log(header);
+  return (
+    <h1>{header}</h1>
+  )
+}
+
+const Part = ({part}) => {
+  console.log(part);
+  return (
+    <>
+      <p>{part.name}  {part.exercises}</p>
+    </>
+  )
+}
+
+const Content = ({content}) => {
+  console.log(content);
+  return (
+    <>
+      {content.map(part => <Part key={part.id} part={part} />)}
+    </>
+  )
+}
+
+const Course = ({course}) => {
+  console.log(course);
+  return (
+    <>
+      <Header header={course.name} />
+      <Content content={course.parts} />
+    </>
+  )
+}
+
 const App = () => {
   const course = {
     id: 1,
