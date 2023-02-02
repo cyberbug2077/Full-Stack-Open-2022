@@ -1,8 +1,10 @@
 import { useState } from 'react'
-const Persons = ({persons}) => {
+const Persons = ({persons, show}) => {
   return (
     <div> 
-     {persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)}
+     {persons
+      .filter(item => item? item.name.toLowerCase().includes(show.toLowerCase()) : true)
+      .map(person => <p key={person.name}>{person.name} {person.number}</p>)}
     </div>
   )
 }
@@ -14,9 +16,11 @@ const App = () => {
   ]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [show, setShow] = useState('')
 
   const handleNewName = event => setNewName(event.target.value)
   const handleNewNumber = event => setNewNumber(event.target.value)
+  const handleShow = event => setShow(event.target.value)
 
   const addPerson = event => {
     event.preventDefault()
@@ -32,6 +36,16 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <form>
+        <div>
+          filter shown with: 
+          <input 
+            value={show} 
+            onChange={handleShow}/>
+        </div>
+      </form>
+
+      <h2>add a new</h2>
       <form onSubmit={addPerson}>
         <div>
           name: <input 
@@ -48,7 +62,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-        <Persons persons={persons} />
+        <Persons persons={persons} show={show}/>
       ...
       <div>debug: {newName}</div>
     </div>
