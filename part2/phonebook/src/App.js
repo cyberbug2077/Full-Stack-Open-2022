@@ -5,12 +5,23 @@ import PersonForm from './components/PersonForm'
 import personService from './services/persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
+
+  const [persons, setPersons] = useState([{ name: 'Arto Hellas' }]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [show, setShow] = useState('')
+
+  const handleNewName = event => setNewName(event.target.value)
+  const handleNewNumber = event => setNewNumber(event.target.value)
+  const handleShow = event => setShow(event.target.value)
+
+  const loadPersons = () => {
+    personService
+      .getAll()
+      .then(initPersons => {
+        setPersons(initPersons)
+      })
+  } 
 
   const removePerson = (person) => 
     () => {
@@ -23,26 +34,20 @@ const App = () => {
       }
     }
 
-  const loadPersons = () => {
-    personService
-      .getAll()
-      .then(initPersons => {
-        setPersons(initPersons)
-      })
-  } 
-
-  useEffect(loadPersons, [])
-
-  const handleNewName = event => setNewName(event.target.value)
-  const handleNewNumber = event => setNewNumber(event.target.value)
-  const handleShow = event => setShow(event.target.value)
-
   const addPerson = event => {
     event.preventDefault()
     const person = {name: newName,
                     number: newNumber}
     if(persons.filter(item => item.name === person.name).length > 0 ) {
-      alert(`${newName} is already added to phonebook`);
+      if(window.confirm(`${newName} is already added to phonebook, repalace the old number with the new one? `)) {
+        personService
+          .update(persons.find(p => p.name === person.name).id, person)
+          .then(modifiedPerson => {
+            setPersons(persons.map(p => p.id === modifiedPerson.id ? person : p))
+            setNewName('') 
+            setNewNumber('')
+          })
+      }
     } else {
       personService
         .creat(person)
@@ -53,6 +58,8 @@ const App = () => {
         })
     }
   }
+
+  useEffect(loadPersons, [])
 
   return (
     <div>
