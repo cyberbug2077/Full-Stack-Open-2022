@@ -3,6 +3,7 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import axios from 'axios'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -13,11 +14,10 @@ const App = () => {
   const [show, setShow] = useState('')
 
   const hook = () => {
-    axios
-      .get('http://localhost:3001/persons') 
-      .then(response => {
-        console.log('respons:', response);
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initPersons => {
+        setPersons(initPersons)
       })
   } 
 
@@ -34,11 +34,11 @@ const App = () => {
     if(persons.filter(item => item.name === person.name).length > 0 ) {
       alert(`${newName} is already added to phonebook`);
     } else {
-      axios
-        .post('http://localhost:3001/persons', person)
-        .then(response => {
-          setPersons(persons.concat(person))
-          setNewName('')
+      personService
+        .creat(person)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
+          setNewName('') 
           setNewNumber('')
         })
     }
