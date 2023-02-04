@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
 import personService from './services/persons'
 
 const App = () => {
@@ -10,10 +11,19 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [show, setShow] = useState('')
+  const [notice, setNotice] = useState(null)
 
   const handleNewName = event => setNewName(event.target.value)
   const handleNewNumber = event => setNewNumber(event.target.value)
   const handleShow = event => setShow(event.target.value)
+
+  const displayNotice = (type, content) => {
+    const newNotice = {type,content}
+    setNotice(newNotice)
+    setTimeout(() => {
+      setNotice(null)
+    }, 5000);
+  }
 
   const loadPersons = () => {
     personService
@@ -30,6 +40,7 @@ const App = () => {
            .remove(person.id)
            .then(() => {
              loadPersons()
+             displayNotice('delete', `Delete ${person.name}`)
            })
       }
     }
@@ -46,6 +57,7 @@ const App = () => {
             setPersons(persons.map(p => p.id === modifiedPerson.id ? person : p))
             setNewName('') 
             setNewNumber('')
+            displayNotice('change', `Update ${modifiedPerson.name}`)
           })
       }
     } else {
@@ -55,6 +67,7 @@ const App = () => {
           setPersons(persons.concat(newPerson))
           setNewName('') 
           setNewNumber('')
+          displayNotice('add', `Add ${person.name}`)
         })
     }
   }
@@ -64,6 +77,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notice={notice}/>
       <Filter show={show} handleShow={handleShow} />
       <h3>add a new</h3>
       <PersonForm 
@@ -75,7 +89,6 @@ const App = () => {
       />
       <h3>Numbers</h3>
       <Persons persons={persons} show={show} handleDelete={removePerson}/>
-      <div>debug: {newName}</div>
     </div>
   )
 }
