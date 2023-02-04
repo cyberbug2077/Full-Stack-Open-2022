@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
-import axios from 'axios'
 import personService from './services/persons'
 
 const App = () => {
@@ -13,7 +12,18 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [show, setShow] = useState('')
 
-  const hook = () => {
+  const removePerson = (person) => 
+    () => {
+      if(window.confirm(`Delete ${person.name} ?`)){
+         personService
+           .remove(person.id)
+           .then(() => {
+             loadPersons()
+           })
+      }
+    }
+
+  const loadPersons = () => {
     personService
       .getAll()
       .then(initPersons => {
@@ -21,7 +31,7 @@ const App = () => {
       })
   } 
 
-  useEffect(hook, [])
+  useEffect(loadPersons, [])
 
   const handleNewName = event => setNewName(event.target.value)
   const handleNewNumber = event => setNewNumber(event.target.value)
@@ -57,7 +67,7 @@ const App = () => {
         handleNewNumber={handleNewNumber} 
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} show={show}/>
+      <Persons persons={persons} show={show} handleDelete={removePerson}/>
       <div>debug: {newName}</div>
     </div>
   )
